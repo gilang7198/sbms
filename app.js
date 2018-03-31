@@ -1,46 +1,125 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+import React, { Component } from 'react';
+ 
+import { AppRegistry, StyleSheet, TextInput, View, Alert, Button } from 'react-native';
 
-var index = require('./routes/index');
-var users = require('./routes/users');
+export default class App extends React.Component {
+constructor(props) {
+ 
+  super(props)
+  
+  this.state = {
+  
+    TextInputUsername: '',
+    TextInputPassword: '',
+    TextInputEmail: ''
+  
+  }
+  
+}
+InsertDataToServer = () =>{
 
-var app = express();
+ 
+  const { TextInputUsername }  = this.state ;
+  const { TextInputPassword }  = this.state ;
+  const { TextInputEmail }  = this.state ;
+ 
+ fetch('http://192.168.21.193/react_native/create_user.php', {
+   method: 'POST',
+   headers: {
+     'Accept': 'application/json',
+     'Content-Type': 'application/json',
+   },
+   body: JSON.stringify({
+ 
+     username: TextInputUsername,
+ 
+     password: TextInputPassword,
+ 
+     email: TextInputEmail
+ 
+   })
+ 
+ }).then((response) => response.json())
+       .then((responseJson) => {
+ 
+ // Showing response message coming from server after inserting records.
+         Alert.alert(responseJson);
+ 
+       }).catch((error) => {
+         console.error(error);
+       });
+  
+  
+   }
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+  render() {
+    return (
+      <View style={styles.MainContainer}>
+        <TextInput
+          
+          // Adding hint in Text Input using Place holder.
+          placeholder="Enter Username"
+ 
+          onChangeText={TextInputUsername => this.setState({TextInputUsername})}
+ 
+          // Making the Under line Transparent.
+          underlineColorAndroid='transparent'
+ 
+          style={styles.TextInputStyleClass}
+        />
+ 
+        <TextInput
+          
+          // Adding hint in Text Input using Place holder.
+          placeholder="Enter Password"
+ 
+          onChangeText={TextInputPassword => this.setState({TextInputPassword})}
+ 
+          // Making the Under line Transparent.
+          underlineColorAndroid='transparent'
+ 
+          style={styles.TextInputStyleClass}
+        />
+ 
+        <TextInput
+          
+          // Adding hint in Text Input using Place holder.
+          placeholder="Enter Email"
+ 
+          onChangeText={TextInputEmail => this.setState({TextInputEmail})}
+ 
+          // Making the Under line Transparent.
+          underlineColorAndroid='transparent'
+ 
+          style={styles.TextInputStyleClass}
+        />
+ 
+        <Button title="Insert Text Input Data to Server" onPress={this.InsertDataToServer} color="#2196F3" />
+      </View>
+    );
+  }
+}
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', index);
-app.use('/users', users);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+const styles = StyleSheet.create({
+ 
+  MainContainer :{
+   
+  justifyContent: 'center',
+  flex:1,
+  margin: 10
+  },
+  
+  TextInputStyleClass: {
+  
+  textAlign: 'center',
+  marginBottom: 7,
+  height: 40,
+  borderWidth: 1,
+  // Set border Hex Color Code Here.
+   borderColor: '#FF5722',
+   
+  // Set border Radius.
+   //borderRadius: 10 ,
+  }
+   
 });
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
